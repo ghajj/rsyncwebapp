@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}SMB Shares Results{% endblock %}
+
+{% block content %}
+<h2>SMB Shares Results</h2>
+<h6>Reads results from smb_shares.yaml in home dir</h6>
+
+<!-- Display the contents of the mount_smb_shares script if available -->
+{% if mount_script_content %}
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            Current mount_smb_shares Script in the /home/user/rsyncwebapp directory. 
+            Log on the server and execute with sudo.
+            <form action="{{ url_for('smb_shares.clear_mount_script') }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn btn-danger btn-sm float-right">Clear Script</button>
+            </form>
+        </div>
+        <div class="card-body">
+            <pre>{{ mount_script_content }}</pre>
+        </div>
+    </div>
+{% else %}
+    <p>No mount script found.</p>
+{% endif %}
+
+{% if smb_shares %}
+    <table>
+        <thead>
+            <tr>
+                <th>NetBIOS Name</th>
+                <th>IP Address</th>
+                <th>Share Name</th>
+                <th>Share Type</th>
+                <th>Share Comment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ip, shares in smb_shares.items() %}
+                {% for share in shares %}
+                    <tr>
+                        <td style="background-color: #ccffcc">{{ share['NetBIOS Name'] }}</td>
+                        <td style="background-color: #ffffcc">{{ ip }} &nbsp; </td>
+                        <td style="background-color: #ffcccc">{{ share['Share Name'] }}</td>
+                        <td style="background-color: #ccccff">{{ share['Share Type'] }}</td>
+                        <td style="background-color: #ffccff">{{ share['Share Comment'] }}</td>
+                        <td>
+                            <form action="{{ url_for('smb_shares.mount_share') }}" method="POST" style="display:inline;">
+                                <input type="hidden" name="ip" value="{{ ip }}">
+                                <input type="hidden" name="netbios_name" value="{{ share['NetBIOS Name'] }}">
+                                <input type="hidden" name="share_name" value="{{ share['Share Name'] }}">
+                                <button type="submit" class="btn btn-primary btn-sm">Add to Mount Script</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    <p>No SMB shares found.</p>
+{% endif %}
+{% endblock %}

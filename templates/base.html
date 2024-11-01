@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Rsync Web App{% endblock %}</title>
+    <!-- Include CSS, e.g., Bootstrap for styling -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.3/font/bootstrap-icons.css">
+    <!-- Custom CSS for additional styling -->
+    <style>
+        .navbar-nav .nav-item.active .nav-link {
+            font-weight: bold;
+            color: #007bff !important;
+        }
+        .flashes {
+            list-style: none;
+            padding-left: 0;
+        }
+        .dropdown:hover .dropdown-menu {
+            display: block;
+            margin-top: 0; /* Remove margin so it doesn't offset */
+        }
+        .dropdown-menu .dropdown-item.active, .dropdown-menu .dropdown-item:hover {
+            background-color: #007bff;
+            color: white;
+        }
+        /* Flash message overlay styling */
+        .flash-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1050;
+            width: auto;
+            max-width: 300px;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Flash overlay container for flash messages -->
+    <div id="flash-overlay-container"></div>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{{ url_for('index') }}">Rsync Web App</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <!-- Dropdown for Task Links -->
+                <li class="nav-item dropdown {% if request.endpoint in ['index', 'browse_task'] %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="tasksDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        Tasks
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="tasksDropdown">
+                        <a class="dropdown-item {% if request.endpoint == 'index' %}active{% endif %}" href="{{ url_for('index') }}">Tasks</a>
+                        <a class="dropdown-item {% if request.endpoint == 'browse_task' %}active{% endif %}" href="{{ url_for('browse.browse') }}">Setup Rsync Task</a>
+                    </div>
+                </li>
+                <!-- Dropdown for Log Links -->
+                <li class="nav-item dropdown {% if request.endpoint in ['logs.list_logs', 'logs.browse_for_log_location'] %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="logsDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        Logs
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="logsDropdown">
+                        <a class="dropdown-item {% if request.endpoint == 'logs.list_logs' %}active{% endif %}" href="{{ url_for('logs.list_logs') }}">Logs</a>
+                        <a class="dropdown-item {% if request.endpoint == 'logs.browse_for_log_location' %}active{% endif %}" href="{{ url_for('logs.browse_for_log_location') }}">Set Logs Location</a>
+                    </div>
+                </li>
+                <!-- Additional Menu Items -->
+                <li class="nav-item {% if request.endpoint == 'view_tasks.view_shell_script' %}active{% endif %}">
+                    <a class="nav-link" href="{{ url_for('view_tasks.view_shell_script') }}">Shell Script</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'view_tasks.view_crontab' %}active{% endif %}">
+                    <a class="nav-link" href="{{ url_for('view_tasks.view_crontab') }}">Crontab Tasks</a>
+                </li>
+                <li class="nav-item {% if request.endpoint == 'server_management.servers' %}active{% endif %}">
+                    <a class="nav-link" href="{{ url_for('server_management.servers') }}">Manage Servers</a>
+                </li>
+
+                <!-- Dropdown for SMB Links -->
+                <li class="nav-item dropdown {% if request.endpoint in ['netbios.scan_netbios', 'netbios.netbios_results'] %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="#" id="SMBDropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                        SMB
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="SMBDropdown">
+                        <a class="dropdown-item {% if request.endpoint == 'netbios.scan_netbios' %}active{% endif %}" href="{{ url_for('netbios.scan_netbios') }}">Netbios scan</a>
+                        <a class="dropdown-item {% if request.endpoint == 'netbios.netbios_results' %}active{% endif %}" href="{{ url_for('netbios.netbios_results') }}">Netbios scan results</a>
+                        <a class="dropdown-item {% if request.endpoint == 'smb_shares.scan_shares' %}active{% endif %}" href="{{ url_for('smb_shares.scan_shares') }}">Scan shares</a>
+                        <a class="dropdown-item {% if request.endpoint == 'smb_shares.smb_shares_results' %}active{% endif %}" href="{{ url_for('smb_shares.smb_shares_results') }}">Scan sharesresults</a>
+                    </div>
+                </li>
+            </ul>
+    
+            <ul class="navbar-nav ml-auto">
+                <!-- Logout Button -->
+                <li class="nav-item {% if request.endpoint == 'logout' %}active{% endif %}">
+                    <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        {% block content %}  <!-- Content block for extending templates -->
+        {% endblock %}
+    </div>
+
+    <!-- Include JavaScript, e.g., Bootstrap for interactive components -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <!-- Flash Overlay Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Iterate through each flashed message
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    // Create an overlay div for each flash message
+                    var flashDiv = document.createElement('div');
+                    flashDiv.className = 'alert alert-{{ category }} flash-overlay';
+                    flashDiv.innerText = '{{ message }}';
+                    
+                    // Append the message to the flash container
+                    document.getElementById('flash-overlay-container').appendChild(flashDiv);
+                    
+                    // Set timeout to remove the message
+                    setTimeout(function() {
+                        flashDiv.remove();
+                    }, 5000); // 5 seconds
+                {% endfor %}
+            {% endwith %}
+        });
+    </script>
+</body>
+</html>

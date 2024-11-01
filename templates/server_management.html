@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Servers{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Manage Yaml/Settings Servers</h2>
+    <p>Here you can manage  the YAML/Settings for a particular server.</p>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Server Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for server in servers %}
+            <tr>
+                <td>{{ server }}</td>
+                <td>
+                    <form action="{{ url_for('server_management.servers') }}" method="post" style="display:inline;">
+                        <input type="hidden" name="old_name" value="{{ server }}">
+                        <input type="text" name="new_name" placeholder="New name" required>
+                        <button type="submit" class="btn btn-primary btn-sm">Rename</button>
+                    </form>
+                    <form action="{{ url_for('server_management.delete_server', server_name=server) }}" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-danger btn-sm">Remove from yaml</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

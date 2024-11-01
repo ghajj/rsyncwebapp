@@ -1,0 +1,153 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-5">  <!-- Main container with top margin -->
+        <h3 class="text-center">Configure Rsync task</h3>
+
+
+        <form method="post">
+            <a style="font-style: italic;"> (Pay attention to trailing slash if needed)</a>
+            <div class="form-row">
+                <div class="col-md-4">
+                    <label><strong>Source Directory: </strong></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" name="source_dir" class="form-control" value="{{ pair.source_dir }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-4">
+                    <label><strong>Destination Directory:</strong></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" name="destination_dir" class="form-control" value="{{ pair.destination_dir }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="col-md-4">
+                    <label><strong>Task name:</strong></label>
+                </div>
+                <div class="col-md-8">
+                    <input type="text" name="task_name" class="form-control" value="{{ pair.task_name }}">
+                </div>
+            </div>
+            <h4>Rsync Options</h4>
+            <div class="form-row">  <!-- Bootstrap row for layout -->
+                <div class="col-md-4">  <!-- Bootstrap column -->
+                    <label>
+                        <input type="checkbox" name="recursive" {% if pair.rsync_options and pair.rsync_options.get("recursive") %} checked {% endif %}>
+                        Recursive
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="verbose" {% if pair.rsync_options and pair.rsync_options.get("verbose") %} checked {% endif %}>
+                        Verbose
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="archive" {% if pair.rsync_options and pair.rsync_options.get("archive") %} checked {% endif %}>
+                        Archive
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label>
+                        <input type="checkbox" name="quiet" {% if pair.rsync_options and pair.rsync_options.get("quiet") %} checked {% endif %}>
+                        quiet
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="dry_run" {% if pair.rsync_options and pair.rsync_options.get("dry_run") %} checked {% endif %}>
+                        Dry Run
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="delete" {% if pair.rsync_options and pair.rsync_options.get("delete") %} checked {% endif %}>
+                        Delete
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label>
+                        <input type="checkbox" name="preserve_owner" {% if pair.rsync_options and pair.rsync_options.get("preserve_owner") %} checked {% endif %}>
+                        Preserve Owner
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="preserve_group" {% if pair.rsync_options and pair.rsync_options.get("preserve_group") %} checked {% endif %}>
+                        Preserve Group
+                    </label><br>
+                    <label>
+                        <input type="checkbox" name="preserve_time" {% if pair.rsync_options and pair.rsync_options.get("preserve_time") %} checked {% endif %}>
+                        Preserve Modification Time
+                    </label>
+                </div>
+            </div>
+            <div class="form-row mt-3">  <!-- New row for additional options -->
+                <div class="col-md-4">
+                    <label>
+                        <input type="checkbox" name="prune_empty_dirs" {% if pair.rsync_options and pair.rsync_options.get("prune_empty_dirs") %} checked {% endif %}>
+                        Prune Empty Directories
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label>
+                        <input type="checkbox" name="preserve_xattrs" {% if pair.rsync_options and pair.rsync_options.get("preserve_xattrs") %} checked {% endif %}>
+                        Preserve Extended Attributes
+                    </label>
+                </div>
+                <div class="col-md-4">
+                    <label>
+                        <input type="checkbox" name="log-file" {% if pair.rsync_options and pair.rsync_options.get("log-file") %} checked {% endif %}>
+                        Rsync log-file option
+                    </label>
+                </div>
+            </div>
+
+            <h4>Extra Rsync Options</h4>
+            <div class="form-group">  <!-- Form group for input field -->
+                <input type="text" name="extra_options" class="form-control" value="{{ pair.extra_options }}">
+            </div>
+
+            <h4>User Crontab Daily Schedule</h4>
+            <div class="form-row">  <!-- Form row for schedule -->
+                <div class="col-md-6"><label for="hour">Hour:</label>
+                    <select name="hour" class="form-control">  <!-- Bootstrap styled select -->
+                        <option value="*" {% if pair.schedule and pair.schedule.get("hour") == "*" %} selected {% endif %}>Every Hour</option>
+                        {% for i in range(0, 24) %}
+                            <option value="{{ i }}" {% if pair.schedule and pair.schedule.get("hour") == i %} selected {% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="minute">Minute:</label>
+                    <select name="minute" class="form-control">  <!-- Bootstrap styled select -->
+                        <option value="*" {% if pair.schedule and pair.schedule.get("minute") == "*" %} selected {% endif %}>Every Minute</option>
+                        {% for i in range(0, 60) %}
+                            <option value="{{ i }}" {% if pair.schedule and pair.schedule.get("minute") == i %} selected {% endif %}>
+                                {{ i }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <h4>Execution Options</h4>
+            <div class="form-group">  <!-- Form group for checkboxes -->
+                <label>
+                    <input type="checkbox" name="write_to_crontab" {% if pair.get("write_to_crontab", False) %} checked {% endif %}>
+                    Write to Crontab (user)
+                </label><br>
+                <label>
+                    <input type="checkbox" name="write_to_shell_script" {% if pair.get("write_to_shell_script", False) %} checked {% endif %}>
+                    Write to Shell Script (shell needs to be added by root to root crontab)
+                </label>
+            </div>
+
+            <div class="text-center mt-3">  <!-- Centered submit button -->
+                <input type="submit" class="btn btn-primary" value="Save Configuration">  <!-- Bootstrap styled submit button -->
+            </div>
+        </form>
+
+        <div class="text-center mt-4">  <!-- Centered back to main link -->
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Back to Main Page</a>  <!-- Secondary button for back to main -->
+        </div>
+    </div>
+{% endblock %}

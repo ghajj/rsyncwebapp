@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Scan SMB Shares{% endblock %}
+
+{% block content %}
+<h2>Scan for SMB Shares</h2>
+<h6>Samba username and password are required if share are user and password protected</h6>
+<h6>Note: mount and rsync may not work if share are user and password protected</h6>
+<h6>Saves results to smb_shares.yaml in home dir</h6>
+
+
+<form action="{{ url_for('smb_shares.scan_shares') }}" method="post">
+    <div>
+        <label for="username">Samba Username:</label>
+        <input type="text" id="username" name="username" >
+    </div>
+    <div>
+        <label for="password">Samba Password:</label>
+        <input type="password" id="password" name="password" >
+    </div>
+    <div>
+        <label for="share_type">Share Type:</label>
+        <input type="text" id="share_type" value="Disk" name="share_type">
+    </div>
+    <div>
+        <label for="verbose">Verbose:</label>
+        <input type="checkbox" id="verbose" name="verbose">
+    </div>
+    <div>
+        <button type="submit">Scan</button>
+    </div>
+</form>
+
+{% if get_flashed_messages() %}
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+    </div>
+{% endif %}
+
+{% endblock %}

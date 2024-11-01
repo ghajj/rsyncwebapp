@@ -1,0 +1,17 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3 class="text-center">Rsync Entries in Crontab (user)</h3>
+        </div>
+        <p><strong>(Minute) (Hour) (Day-of-Month) (Month) (Day-of-Week)</strong> <strong>Command</strong> </p>
+        <ul class="list-group">  <!-- Display the list of rsync entries -->
+            {% for entry in rsync_entries %}
+                <li class="list-group-item">{{ entry }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

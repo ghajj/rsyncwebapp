@@ -1,0 +1,46 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">  <!-- Container with top margin for layout -->
+        <h3 class="text-center">{{hostname}} Web App</h3>  <!-- Centered heading -->
+        <h5 class="text-center"> Login to SSH Server</h5>  <!-- Centered heading -->
+        <h5 class="text-center"> Rsync tasks will be sent to SSH Server</h5>  <!-- Centered heading -->
+
+        <div class="row justify-content-center">  <!-- Center the login form -->
+            <div class="col-md-6">  <!-- Use a responsive column -->
+                <form action="/login" method="post">
+                    <div class="form-group">  <!-- Form group for styling -->
+                        <label for="server">Server:</label>
+                        <input type="text" id="server" name="server" class="form-control" required>  <!-- Bootstrap input field -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="username">Username:</label>
+                        <input type="text" id="username" name="username" class="form-control" required>  <!-- Bootstrap input field -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" name="password" class="form-control">  <!-- Password input field -->
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="private_key_path">Private Key Path:</label>
+                        <input type="text" id="private_key_path" name="private_key_path" class="form-control">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="passphrase">Passphrase:</label>
+                        <input type="password" id="passphrase" name="passphrase" class="form-control">  <!-- Password input field -->
+                    </div>
+                    
+                    <div class="text-center">  <!-- Center the submit button -->
+                        <input type="submit" value="Login" class="btn btn-primary">  <!-- Bootstrap styled button -->
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

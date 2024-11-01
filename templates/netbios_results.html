@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}NetBIOS Scan Results{% endblock %}
+
+{% block content %}
+<h2>NetBIOS Scan Results</h2>
+<h6>Reads results from netbios_names.yaml in home dir</h6>
+
+<table>
+    <thead>
+        <tr>
+            <th>IP Address</th>
+            <th>NetBIOS Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if netbios_names %}
+            {% for ip, name in netbios_names.items() %}
+            <tr>
+                <td>{{ ip }} : </td>
+                <td>{{ name }}</td>
+            </tr>
+            {% endfor %}
+        {% else %}
+            <tr>
+                <td colspan="2">No NetBIOS names found.</td>
+            </tr>
+        {% endif %}
+    </tbody>
+</table>
+<a href="{{ url_for('netbios.scan_netbios') }}">Scan Again</a>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Scan NetBIOS{% endblock %}
+
+{% block content %}
+<h2>Scan for NetBIOS Names</h2>
+<h6>It takes approximately 255 x timeout in seconds to complete</h6>
+<h6>You can leave this page as scan will continue in the background</h6>
+<h6>Saves results to netbios_names.yaml in home dir</h6>
+
+<form method="POST">
+    <div>
+        <label for="prefix">Network Prefix:</label>
+        <input type="text" id="prefix" name="prefix" value="192.168.10.0/24" required>
+    </div>
+    <div>
+        <label for="timeout">Timeout (seconds):</label>
+        <input type="number" id="timeout" name="timeout" value="1" required>
+    </div>
+    <div>
+        <label for="verbose">Verbose:</label>
+        <input type="checkbox" id="verbose" name="verbose">
+    </div>
+    <button type="submit">Scan</button>
+</form>
+
+<h3>Scan Progress</h3>
+<div id="progress-container">
+    <p>Scanning... <span id="progress-text"></span></p>
+    <div id="progress-bar" style="width: 0%; height: 20px; background-color: green;"></div>
+    <table>
+        <thead>
+            <tr>
+                <th>Found:</th>
+            <tr>
+				<th>IP Address :   </th>
+                <th>NetBIOS Name</th>
+            </tr>
+        </thead>
+        <tbody id="progress-table">
+        </tbody>
+    </table>
+</div>
+
+<script>
+    function updateProgress() {
+        fetch('{{ url_for("netbios.get_scan_progress") }}')
+            .then(response => response.json())
+            .then(data => {
+                const progressBar = document.getElementById('progress-bar');
+                const progressText = document.getElementById('progress-text');
+                const progressTable = document.getElementById('progress-table');
+                const percent = (data.current / data.total) * 100;
+                progressBar.style.width = percent + '%';
+                progressText.textContent = data.current + ' / ' + data.total;
+                //console.log(data);
+                // Assuming data.netbios_names is an array of json pairs like [{ '192.168.1.1':'server1'},{ '192.168.1.2':'server2'}]
+                const netbiosNamesHtml = data.netbios_names.map(entry => `<tr><td>${Object.keys(entry)[0]} : \t</td><td> ${Object.values(entry)[0]}</td></tr>`).join('');
+                progressTable.innerHTML = netbiosNamesHtml;
+                if (data.current < data.total) {
+                    setTimeout(updateProgress, 1000);
+                } else {
+                    progressText.textContent = "Scan complete!";                   
+                }
+            });
+    }
+
+    // delay the inital update to reset the counters
+    setTimeout(function() {
+        updateProgress();
+    }, 2000);
+</script>
+{% endblock %}

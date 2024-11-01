@@ -1,0 +1,49 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3 class="text-center">Available Log Files</h3>
+        </div>
+        <div class="container mt-5">
+            <form action="{{ url_for('logs.delete_logs_older_than') }}" method="post">
+                <div class="row justify-content-end"> <!-- Align items to the right -->
+                    <div class="col-md-2"> <!-- Adjust column width as needed -->
+                        <button type="submit" class="btn btn-primary btn-block">Delete Logs</button>
+                    </div>
+                    <div class="col-md-4"> <!-- Adjust column width as needed -->
+                        <select class="form-control" id="age_threshold" name="age_threshold">
+                            <option value=0>all</option>
+                            <option value=1>older than 1 day</option>
+                            <option value=7 selected>older than 7 days</option>
+                            <option value=30>older than 30 days</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <p>{{ message }} in {{ log_files_location }}</p>
+
+        <div style="max-height: 400px; overflow-y: scroll;">  <!-- Div to make list scrollable -->
+            <ul class="list-group">
+                {% for log_file in log_files_with_info %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ log_file['name'] }}&emsp;&emsp;{{ log_file['modified_date'] }} 
+                                &emsp;&emsp;{{ log_file['size'] }}<!-- added tab for spacing -->
+                        <span>
+                            <!-- Link to view the log file -->
+                            <a href="{{ url_for('logs.view_log', log_file=log_file['name']) }}" class="btn btn-info btn-sm">View</a>
+                            <!-- Form to delete the log file -->
+                            <form action="{{ url_for('logs.delete_log', log_file=log_file['name']) }}" method="post" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this log file?');">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>  <!-- End of div to make list scrollable --> 
+    </div>
+{% endblock %}

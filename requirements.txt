@@ -1,0 +1,6 @@
+Flask>=2.0.0
+Flask-Session
+paramiko
+pyyaml
+gunicorn
+# Add other dependencies as needed

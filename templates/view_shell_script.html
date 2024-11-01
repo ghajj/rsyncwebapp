@@ -1,0 +1,20 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3 class="text-center">Shell Script</h3>
+            <a href="{{ url_for('view_tasks.execute_shell_script') }}" class="btn btn-primary">Execute</a>
+        </div>
+        <h6>This bash script can be executed by root if crontab user may have issues copying protected files </h6>
+        <h6>Could be added to the root crontab, (not recommended for security reasons)</h6>
+        <p><strong>{{ script_full_path }} Shell Script Content:</strong></p>
+
+        <pre>{{ script_content }}</pre>  <!-- Display the content of the shell script -->
+
+        <a href="{{ url_for('view_tasks.purge_script') }}" class="btn btn-danger" onclick="return confirm('Are you sure you want to clear the script?');">Clear Script</a>
+
+    </div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">  <!-- Main container with top margin -->
+        <p class="text-center">You are logged into server: {{ server }} from {{ hostname }}</p>  <!-- Display server information -->
+        <p class="text-center">Log files are in: {{ logfiles }}</p>  <!-- Display server information -->
+
+        <hr>  <!-- Horizontal separator -->
+
+        {% if server_data %}
+            <h3>Rsync Pairs for Server: {{ server }}</h3>
+            <ul class="list-group">  <!-- Bootstrap list group for styling -->
+                {% for index, pair in enumerate(server_data) %}
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center">  <!-- Bootstrap for layout -->
+                        <div>
+                            <strong>Task name:</strong> {{ pair.task_name }}<br>
+                            <strong>Source:</strong> {{ pair.source_dir }}<br>
+                            <strong>Destination:</strong> {{ pair.destination_dir }}
+                        </div>
+                        <div>
+                            <!-- Indicators with hover text -->
+                            <span class="ml-3">  <!-- Margin-left for spacing -->
+                                {% if pair.get("write_to_shell_script", False) %}
+                                    <i class="bi bi-file-earmark-check text-success" data-toggle="tooltip" title="Shell Script Enabled"></i>  <!-- Tooltip for enabled -->
+                                {% else %}
+                                    <i class="bi bi-file-earmark-x text-danger" data-toggle="tooltip" title="Shell Script Disabled"></i>  <!-- Tooltip for disabled -->
+                                {% endif %}
+
+                                {% if pair.get("write_to_crontab", False) %}
+                                    <i class="bi bi-clock text-success" data-toggle="tooltip" title="Crontab Enabled"></i>  <!-- Tooltip for enabled -->
+                                {% else %}
+                                    <i class="bi bi-clock-x text-danger" data-toggle="tooltip" title="Crontab Disabled"></i>  <!-- Tooltip for disabled -->
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div>
+                            <!-- Button to configure the pair -->
+                            <a href="{{ url_for('configure.configure', pair_index=index) }}" class="btn btn-info btn-sm">Configure</a>  <!-- Bootstrap styled button -->
+                            <!-- Button to remove the pair -->
+                            <a href="{{ url_for('remove_pair', pair_index=index) }}" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this pair?');">Remove</a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-center">No directory pairs found for this server.</p>
+        {% endif %}
+    </div>
+    <script>
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();  <!-- Initialize Bootstrap tooltips -->
+        });
+    </script>
+{% endblock %}

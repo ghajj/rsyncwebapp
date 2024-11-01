@@ -1,0 +1,18 @@
+services:
+  rsyncwebapp:
+    hostname: rsyncwebapp-container
+    build: .  # Build the Docker image from the current directory
+    container_name: rsyncwebapp
+    ports:
+      - "8003:5003/tcp"  # Map the container port to the host port
+    environment:
+      FLASK_ENV: 'production'
+      FLASK_APP: "app.py"
+      FLASK_DEBUG: "0"
+    env_file:
+      - secrets.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+      - .:/app  # Mount the current directory to the container's `/app`

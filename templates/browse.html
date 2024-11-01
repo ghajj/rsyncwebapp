@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Browse Directories{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">  <!-- Bootstrap container for responsive layout -->
+        <div>
+            <h3 class="text-center">{{ page_title }}</h3>  <!-- Centered page title -->
+        </div>
+        <div class="row justify-content-center">  <!-- Center the content -->
+            <div class="col-md-8">  <!-- Responsive column -->
+
+                <!-- Form for manual path entry and tree-based selection -->
+                <form method="POST">
+                    <div class="d-flex mb-3">  <!-- Align form elements -->
+                        <!-- Input box for entering the path manually, initialized with the current path -->
+                        <input type="text" name="selected_path" class="form-control" value="{{ current_path }}" placeholder="Enter a directory path">  
+                        <button type="submit" class="btn btn-primary ml-2">Set</button>  <!-- Button to submit the form -->
+                    </div>
+
+                    <!-- Display the current path, with inline editing -->
+                    <p>Current Selected Path: {{ current_path }}</p>  <!-- Show the current path -->
+                    
+                    <!-- Directory tree for navigation -->
+                    <ul class="list-group">  <!-- Bootstrap list group -->
+                        {% for item in directories %}
+                            {% if item.is_directory %}
+                                <li>  <!-- List item with Bootstrap styling -->
+                                    <a href="?path={{ current_path }}/{{ item.name }}" class="btn btn-link">
+                                        {{ item.name }}  <!-- Display the directory name -->
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

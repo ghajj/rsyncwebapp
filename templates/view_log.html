@@ -1,0 +1,15 @@
+{% extends "base.html" %}  <!-- Extend from base template -->
+
+{% block title %}Rsync Web Index{% endblock %}  <!-- Define the page title -->
+
+{% block content %}  <!-- Insert content into the base template -->
+    <div class="container mt-4">
+
+        <div class="d-flex justify-content-between align-items-center mt-4">
+            <h3 class="text-center">View Log File:</h3>
+            <p>{{ log_file }}  </p>
+        </div>
+        <pre>{{ log_content }}</pre>  <!-- Display the log file content -->
+        <a href="{{ url_for('logs.list_logs') }}" class="btn btn-secondary mt-4">Back to Log Files</a>  <!-- Link back to the list of log files -->
+    </div>
+{% endblock %}
